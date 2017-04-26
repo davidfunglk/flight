@@ -6,7 +6,7 @@
 # portal, TranStats. It was manually downloaded through a web form, and we compiled it into a zip
 # file to load into R.
 
-download.file(url = "http://point.fungservices.com/flight/data.zip", destfile = "~/Data/data.zip")
+download.file(url = "http://point.fungservices.com/git/flight/data.zip", destfile = "~/Data/data.zip")
 unzip(zipfile = "~/Data/data.zip", exdir = "~/Data/")
 
 #################
