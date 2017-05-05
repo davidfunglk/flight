@@ -30,19 +30,31 @@ background = ggplot(otperformal,aes(as.factor(otperformal$Group.1),otperformal$o
 background2 = background + geom_bar(stat="identity") + ggtitle("On-time Performance by Airlines")
 
 #Determining the hubs
-airport = levels(airdataclean$origincity)
-freq = sapply(1:337,function(i){
-  x = subset(airdataclean,airdataclean$origincity == airport[i])
+airportori = levels(airdataclean$origincity)
+airportdest = levels(airdataclean$destcity)
+airport = unique(airportori,airportdest)
+freqori = sapply(1:337,function(i){
+  x = subset(airdataclean,airdataclean$origincity == airportori[i])
   nrow(x)
 })
-freq = as.numeric(freq)
-airportfreq = cbind(airport,freq)
-airportfreq = as.data.frame(airportfreq)
-airportfreq$freq = as.numeric(as.character(airportfreq$freq))
-airportfreq = airportfreq[order(airportfreq$freq,decreasing = T),]
-rownames(airportfreq) = 1:337
-top20airport = head(airportfreq,50)
+freqdest = sapply(1:335,function(i){
+  y = subset(airdataclean,airdataclean$destcity == airportdest[i])
+  nrow(y)
+})
+freqori = cbind(airportori,freqori)
+freqdest = cbind(airportdest,freqdest)
+freq = merge(freqori,freqdest,by.x = c("airportori"),by.y = c("airportdest"))
+freq$freqori = as.numeric(freq$freqori)
+freq$freqdest = as.numeric(freq$freqdest)
+freq$total = freq$freqori + freq$freqdest
+freq = freq[order(freq$total,decreasing = T),]
+rownames(freq) = 1:333
+
+top20airport = head(freq,20)
 #Plot the top 20 frequent departing airport
-ggplot(top20airport,aes(top50airport$airport,top20airport$freq)) + 
+ggplot(top20airport,aes(top20airport$airport,top20airport$total)) + 
   theme(axis.text.x = element_text(angle=90)) + 
   geom_bar(stat="identity") + ggtitle("Frequency of Flights by Airport")
+
+#Unique air schedule
+airschedule = unique(airdataclean[,c("origincity","destcity")])
