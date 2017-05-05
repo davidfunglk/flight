@@ -70,8 +70,11 @@ data frequentOriginDrop;
 	keep ORIGIN; 
 data sampleOne20; 
 	set sampleOne; 
-	if ORIGIN = 'ATL' or ORIGIN = 'ORD' or ORIGIN = 'DFW' or ORIGIN = 'DEN' or ORIGIN = 'LAX' or ORIGIN = 'PHX' or ORIGIN = 'IAH' or ORIGIN = 'SFO' or ORIGIN = 'LAS' 
-		or ORIGIN = 'DTW' or ORIGIN = 'MSP' or ORIGIN = 'CLT' or ORIGIN = 'SLC' or ORIGIN = 'EWR' or ORIGIN = 'MCO' or ORIGIN = 'BOS' or ORIGIN = 'LGA' or ORIGIN = 'JFK' or ORIGIN = 'SEA' or ORIGIN = 'BWI' then output sampleOne20; 
+	if ORIGIN = 'ATL' or ORIGIN = 'ORD' or ORIGIN = 'DFW' or ORIGIN = 'DEN' or ORIGIN = 'LAX'
+		or ORIGIN = 'PHX' or ORIGIN = 'IAH' or ORIGIN = 'SFO' or ORIGIN = 'LAS' 
+		or ORIGIN = 'DTW' or ORIGIN = 'MSP' or ORIGIN = 'CLT' or ORIGIN = 'SLC'
+		or ORIGIN = 'EWR' or ORIGIN = 'MCO' or ORIGIN = 'BOS' or ORIGIN = 'LGA'
+		or ORIGIN = 'JFK' or ORIGIN = 'SEA' or ORIGIN = 'BWI' then output sampleOne20; 
 ; 
 proc glm data=sampleOne20; 
 	class ORIGIN CARRIER; 
