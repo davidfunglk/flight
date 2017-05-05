@@ -2,6 +2,10 @@
 proc import replace datafile="~/STA 160/pointfive.csv" out=sampleFive dbms=csv; 
 	getnames=yes; 
 	guessingrows=100; 
+proc import datafile="~/STA 160/pointone.csv" out=sampleOne dbms=csv; 
+	getnames=yes; 
+	guessingrows=100; 
+run; 
 /*Changing ARR_DELAY variable type to numbers*/ 
 data sampleFive; 
 	set sampleFive; 
@@ -37,3 +41,39 @@ proc sgplot data=sampleFive;
 	histogram ORIGIN_AIRPORT_ID; 
 run; 
 /*Find most frequent origin airports*/ 
+proc freq data=sampleFive; 
+	tables ORIGIN / out=frequentOrigin; 
+run; 
+proc sort data=frequentOrigin(obs=20); 
+	by descending Count; 
+run; 
+/*Find most frequent destination airports*/ 
+proc freq data=sampleFive; 
+	tables DEST / out=frequentDestination; 
+run; 
+proc sort data=frequentDestination(obs=20); 
+	by descending Count; 
+run; 
+/*Find most frequent airlines*/ 
+proc sql; 
+	select distinct CARRIER from sampleFive; 
+run; 
+proc freq data=sampleFive; 
+	tables CARRIER / out=frequentCarrier; 
+run; 
+proc sort data=frequentCarrier; 
+	by descending Count; 
+run; 
+/*Linear regression by airline and top 20 origin airports on arrival delay*/ 
+data frequentOriginDrop; 
+	set frequentOrigin; 
+	keep ORIGIN; 
+data sampleOne20; 
+	set sampleOne; 
+	if ORIGIN = 'ATL' or ORIGIN = 'ORD' or ORIGIN = 'DFW' or ORIGIN = 'DEN' or ORIGIN = 'LAX' or ORIGIN = 'PHX' or ORIGIN = 'IAH' or ORIGIN = 'SFO' or ORIGIN = 'LAS' 
+		or ORIGIN = 'DTW' or ORIGIN = 'MSP' or ORIGIN = 'CLT' or ORIGIN = 'SLC' or ORIGIN = 'EWR' or ORIGIN = 'MCO' or ORIGIN = 'BOS' or ORIGIN = 'LGA' or ORIGIN = 'JFK' or ORIGIN = 'SEA' or ORIGIN = 'BWI' then output sampleOne20; 
+; 
+proc glm data=sampleOne20; 
+	class ORIGIN CARRIER; 
+	model ARR_DELAY=ORIGIN|CARRIER; 
+run;
