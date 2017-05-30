@@ -160,7 +160,7 @@ saveGIF({for(i in 1:19){
 }
 })
 
-#####
+##### Animation using Plotly
 datasub = airdatadec17
 delaytime = aggregate(datasub$ArrDelayMinutes,list(datasub$Origin,datasub$DepTimeBlk),mean,na.rm = T)
 delaytime$congested = sapply(1:nrow(delaytime),function(i){
@@ -195,3 +195,40 @@ geo <- list(
     layout(
       title = paste("Congested Routes"), geo = geo, showlegend = FALSE
     )
+
+
+#Finding clusters
+#First subset the data.
+datasub = subset(airdata1612,airdata1612$DayofMonth == "3")
+delaytime = aggregate(datasub$ArrDelayMinutes,list(datasub$Origin,datasub$DepTimeBlk),mean,na.rm = T)
+delaytime$congested = sapply(1:nrow(delaytime),function(i){
+  ifelse(delaytime$x[i] >= 30,1,0)
+})
+congested_airport = subset(delaytime,delaytime$congested == 1)
+congestedcounted = aggregate(congested_airport$congested,list(congested_airport$Group.2),length)
+
+#Let me try igraph
+library(igraph)
+delay_airport = lapply(1:19,function(i){
+  subset(delaytime,delaytime$Group.2 == delaytime$Group.2[i])
+})
+delay_airport[[1]]$Group.1 = factor(delay_airport[[1]]$Group.1)
+routes = unique(airdatadec17[,c("Origin","Dest","DepTimeBlk")])
+rownames(routes) = 1:nrow(routes)
+routes = lapply(1:19,function(i){
+  subset(routes,routes$DepTimeBlk == levels(routes$DepTimeBlk)[i])
+})
+
+cluster = sapply(1:19,function(i){
+  routes[[i]]$Origin = factor(routes[[i]]$Origin)
+  routes[[i]]$Dest = factor(routes[[i]]$Dest)
+  airports = data.frame(name = delay_airport[[i]]$Group.1,congested = delay_airport[[i]]$congested)
+  paths = data.frame(from = routes[[i]]$Origin, to = routes[[i]]$Dest)
+  paths = paths[which(paths[,2] %in% airports$name),]
+  paths = paths[which(paths[,1] %in% airports$name),]
+  g = graph_from_data_frame(paths,vertices = airports)
+  V(g)$color = ifelse(airports$congested == 1,"red","green")
+  g = induced.subgraph(g,V(g)[V(g)$color %in% c("red")])
+  plot(g)
+  max(clusters(g)$csize)
+})
