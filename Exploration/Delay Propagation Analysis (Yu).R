@@ -2,7 +2,11 @@ library(ggplot2)
 library(ggmap)
 library(maps)
 library(animation)
+library(plotly)
+library(dplyr)
+
 airdata1612 = read.csv("On_Time_On_Time_Performance_2016_12.csv")
+airports = read.csv("airport.csv")
 
 attach(airdata1612)
 #Subset the data with top airports in terms of frequencys
@@ -29,7 +33,7 @@ ggplot(delaybytime,aes(delaybytime$Group.1,delaybytime$x,group = 1)) +
   geom_line() + geom_point() + ggtitle("Delay Rate of Flights by Departure Time")
 
 #Locating the congested airports on DEC-17.
-airdatadec17 = subset(airdata1612,airdata1612$DayofMonth == "17")
+airdatadec17 = subset(airdata1612,airdata1612$DayofMonth == "15")
 attach(airdatadec17)
 delaytime_airport = aggregate(airdatadec17$ArrDelayMinutes,list(airdatadec17$Origin),mean,na.rm = T)
 delaytime_airport$congested = sapply(1:nrow(delaytime_airport),function(i){
@@ -57,7 +61,6 @@ animatedplot1 = saveGIF({for(i in 1:19){
           ggtitle(paste("Time: ", levels(DepTimeBlk)[i],sep = "")))
   }
 })
-
 #Let pick a day that is not that congest.
 airdatadec17 = subset(airdata1612,airdata1612$DayofMonth == "3")
 attach(airdatadec17)
@@ -81,125 +84,68 @@ animatedplot1 = saveGIF({for(i in 1:19){
 }
 })
 
-
-#Import data for route and location of the airports
-library(plotly)
-library(dplyr)
-routes = read.csv('https://raw.githubusercontent.com/plotly/datasets/master/2011_february_aa_flight_paths.csv')
-air <- read.csv('https://raw.githubusercontent.com/plotly/datasets/master/2011_february_us_airport_traffic.csv')
-air = merge(delaytime_airport,air,by.x = c("Group.1"),by.y = c("iata"))
-air = air[c(1,2,3,6,7,8,10,11,12)]
-aircg = air[c(1,3)]
-routes = merge(routes,aircg,by.x = c("airport1"),by.y = c("Group.1"))
-routes = merge(routes,aircg,by.x = c("airport2"),by.y = c("Group.1"))
-routes$congested = sapply(1:nrow(routes),function(i){
-  ifelse(routes$congested.x[i] == "1" && routes$congested.y[i] == "1",1,0)
-})
-
-
-#Determine clusters if congested airports have direct routes connecting together.
-geo <- list(
-  scope = 'north america',
-  projection = list(type = 'azimuthal equal area'),
-  showland = TRUE,
-  landcolor = toRGB("gray95")
-)
-plot_geo(locationmode = "USA-states") %>%
-  add_markers(
-    data = air, x = ~long, y = ~lat, text = ~airport,
-    size = ~cnt, hoverinfo = "text", alpha = 0.5, color = ~congested, colors = c("green","red")
-  ) %>%
-  add_segments(
-    data = group_by(routes, id),
-    x = ~start_lon, xend = ~end_lon,
-    y = ~start_lat, yend = ~end_lat,
-    alpha = 0.3, size = I(1), color = factor(routes$congested)
-  ) %>%
-  layout(
-    title = "Congested Routes", geo = geo, showlegend = FALSE
-  )
-
-#Let make create a GIF with this version of maps.
-saveGIF({for(i in 1:19){
-  datasub = subset(airdatadec17,airdatadec17$DepTimeBlk == levels(DepTimeBlk)[i])
-  delaytime = aggregate(datasub$ArrDelayMinutes,list(datasub$Origin),mean,na.rm = T)
-  delaytime$congested = sapply(1:nrow(delaytime),function(i){
-    ifelse(delaytime_airport$x[i] >= 30,1,0)
-  })
-  delaytime = merge(delaytime,airportloc,by.x = c("Group.1"),by.y = c("V5"))
-  air1 = merge(delaytime,air,by.x = c("Group.1"),by.y = c("iata"))
-  air1 = air1[c(1,2,3,6,7,8,10,11,12)]
-  aircg = air1[c(1,3)]
-  routes1 = merge(routes,aircg,by.x = c("airport1"),by.y = c("Group.1"))
-  routes1 = merge(routes1,aircg,by.x = c("airport2"),by.y = c("Group.1"))
-  routes1$congested = sapply(1:nrow(routes1),function(i){
-    ifelse(routes1$congested.x[i] == "1" && routes1$congested.y[i] == "1",1,0)
-  })
-  routes1$id = seq_len(nrow(routes1))
-  geo <- list(
-    scope = 'north america',
-    projection = list(type = 'azimuthal equal area'),
-    showland = TRUE,
-    landcolor = toRGB("gray95")
-  )
-  print(
-  plot_geo(locationmode = "USA-states") %>%
-    add_markers(
-      data = air1, x = ~long, y = ~lat, text = ~airport,
-      size = ~cnt, hoverinfo = "text", alpha = 0.5, color = ~congested, colors = c("green","red")
-    ) %>%
-    add_segments(
-      data = group_by(routes1, id),
-      x = ~start_lon, xend = ~end_lon,
-      y = ~start_lat, yend = ~end_lat,
-      alpha = 0.3, size = I(1), color = factor(routes1$congested)
-    ) %>%
-    layout(
-      title = paste("Congested Routes Time: ", levels(DepTimeBlk)[i],sep = ""), geo = geo, showlegend = FALSE
-    ))
-}
-})
-
-##### Animation using Plotly
-datasub = airdatadec17
+#Locating the congested airports on DEC-17.
+datasub = subset(airdata1612,airdata1612$DayofMonth == "17")
 delaytime = aggregate(datasub$ArrDelayMinutes,list(datasub$Origin,datasub$DepTimeBlk),mean,na.rm = T)
 delaytime$congested = sapply(1:nrow(delaytime),function(i){
   ifelse(delaytime$x[i] >= 30,1,0)
 })
-delaytime = merge(delaytime,airportloc,by.x = c("Group.1"),by.y = c("V5"))
-air1 = merge(delaytime,air,by.x = c("Group.1"),by.y = c("iata"))
-routes1 = merge(routes,air1,by.x = c("airport1"),by.y = c("Group.1"))
-routes1 = merge(routes1,air1,by.x = c("airport2"),by.y = c("Group.1"))
-routes1$congested = sapply(1:nrow(routes1),function(i){
-  ifelse(routes1$congested.x[i] == "1" && routes1$congested.y[i] == "1",1,0)
+#Determine clusters if congested airports have direct routes connecting together.
+#Animation of the Congested Routes
+delay_airport = lapply(1:19,function(i){
+  subset(delaytime,delaytime$Group.2 == levels(delaytime$Group.2)[i])
 })
-routes1$id = seq_len(nrow(routes1))
-geo <- list(
-  scope = 'north america',
-  projection = list(type = 'azimuthal equal area'),
-  showland = TRUE,
-  landcolor = toRGB("gray95")
-)
+routes = unique(airdatadec17[,c("Origin","Dest","DepTimeBlk")])
+rownames(routes) = 1:nrow(routes)
+routes = lapply(1:19,function(i){
+  subset(routes,routes$DepTimeBlk == levels(routes$DepTimeBlk)[i])
+})
+air <- read.csv('https://raw.githubusercontent.com/plotly/datasets/master/2011_february_us_airport_traffic.csv')
+airinfo = lapply(1:19,function(i){
+  merge(airports,delay_airport[[i]],by.x = c("iata_code"),by.y = c("Group.1"))
+})
+route1 = lapply(1:19,function(i){
+  merge(routes[[i]],airinfo[[i]],by.x = c("Origin","DepTimeBlk"),by.y = c("iata_code","Group.2"))
+})
+route2 = lapply(1:19,function(i){
+  merge(route1[[i]],airinfo[[i]],by.x = c("Dest","DepTimeBlk"),by.y = c("iata_code","Group.2"))
+})
+airinfo = airinfo %>% bind_rows
+airinfo = merge(airinfo,freq_fight,by.x = c("iata_code"),by.y = c("Group.1"))
+route2 = route2 %>% bind_rows
+route2$congested = sapply(1:nrow(route2),function(i){
+  ifelse(route2$congested.x[i] == "1" && route2$congested.y[i] == "1",1,0)
+})
+route2$id = seq_len(nrow(route2))
 
-  plot_geo(locationmode = "USA-states") %>%
-    add_markers(
-      data = air1, x = ~long, y = ~lat, text = ~airport,
-      size = ~cnt, hoverinfo = "text", alpha = 0.5, color = ~congested, colors = c("green","red")
-    ) %>%
-    add_segments(
-      data = group_by(routes1, id),
-      x = ~start_lon, xend = ~end_lon,
-      y = ~start_lat, yend = ~end_lat,
-      alpha = 0.3, size = I(1), color = factor(routes1$congested)
-    ) %>%
-    layout(
-      title = paste("Congested Routes"), geo = geo, showlegend = FALSE
-    )
+
+plot_geo(locationmode = "USA-states") %>%
+  add_markers(
+    data = airinfo, x = ~longitude_deg, y = ~latitude_deg, text = ~name, frame = ~airinfo$Group.2,
+    size = ~airinfo$x.y, hoverinfo = "text", alpha = 0.5, color = ~congested, colors = c("green","red")
+  ) %>% 
+  layout(
+    title = paste("Congested Routes"), geo = geo, showlegend = FALSE
+  ) %>%
+  add_segments(
+    data = group_by(route2,id), frame = ~DepTimeBlk,
+    x = ~longitude_deg.x, xend = ~longitude_deg.y,
+    y = ~latitude_deg.x, yend = ~latitude_deg.y,
+    alpha = 0.3, size = I(1), color = factor(route2$congested)
+  ) %>%
+  animation_opts(1000,easing = "elastic",redraw = T
+  ) %>%
+  animation_slider(
+    currentvalue = list(prefix = "Time Block ", font = list(color="Black"))
+  )
+
+
+
 
 
 #Finding clusters
 #First subset the data.
-datasub = subset(airdata1612,airdata1612$DayofMonth == "3")
+datasub = subset(airdata1612,airdata1612$DayofMonth == "17")
 delaytime = aggregate(datasub$ArrDelayMinutes,list(datasub$Origin,datasub$DepTimeBlk),mean,na.rm = T)
 delaytime$congested = sapply(1:nrow(delaytime),function(i){
   ifelse(delaytime$x[i] >= 30,1,0)
@@ -210,7 +156,7 @@ congestedcounted = aggregate(congested_airport$congested,list(congested_airport$
 #Let me try igraph
 library(igraph)
 delay_airport = lapply(1:19,function(i){
-  subset(delaytime,delaytime$Group.2 == delaytime$Group.2[i])
+  subset(delaytime,delaytime$Group.2 == levels(delaytime$Group.2)[i])
 })
 delay_airport[[1]]$Group.1 = factor(delay_airport[[1]]$Group.1)
 routes = unique(airdatadec17[,c("Origin","Dest","DepTimeBlk")])
@@ -232,3 +178,21 @@ cluster = sapply(1:19,function(i){
   plot(g)
   max(clusters(g)$csize)
 })
+
+#######
+routes[[1]]$Origin = factor(routes[[1]]$Origin)
+routes[[1]]$Dest = factor(routes[[1]]$Dest)
+airports = data.frame(name = delay_airport[[1]]$Group.1,congested = delay_airport[[1]]$congested)
+paths = data.frame(from = routes[[1]]$Origin, to = routes[[1]]$Dest)
+paths = paths[which(paths[,2] %in% airports$name),]
+paths = paths[which(paths[,1] %in% airports$name),]
+g = graph_from_data_frame(paths,vertices = airports)
+V(g)$color = ifelse(airports$congested == 1,"red","green")
+g = induced.subgraph(g,V(g)[V(g)$color %in% c("red")])
+plot(g)
+max(clusters(g)$csize)
+
+
+
+
+
