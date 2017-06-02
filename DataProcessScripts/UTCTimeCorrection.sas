@@ -8,7 +8,8 @@
  * on the site, distributed under Open Database License (ODbL)    *
  * v1.0.     												      *
  * ************************************************************** */
-/* NOTE: If batch processing, use a macro function. */
+/* NOTE: If batch processing, use a macro function. Otherwise,
+   simply change the import and export filenames. */
 /* Import BTS on-time performance file */
 proc import datafile='~/STA 160/Data/Sept 2008.csv' out=sept08 dbms=csv;
 run;
@@ -81,4 +82,4 @@ data sept08;
 	ArrUTC = ArrTime + ArrOffsetRev;
 run;
 /* Export result as comma-separated file */
-%ds2csv (data=sept08, runmode=b, csvfile='~/STA 160/Data/sept08UTC.csv');
+%ds2csv (data=sept08, runmode=b, csvfile='~/STA 160/Data/SEPT08UTC.csv');
