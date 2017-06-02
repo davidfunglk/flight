@@ -11,11 +11,11 @@ run;
 /* Count all cancelled flights based on origin and date */
 proc freq data=oct16;
 	where Cancelled = 1;
-	tables Origin*FlightDate / out=cancel;
+	tables Origin*FlightDateUTC / out=cancel;
 run;
 /* Count all scheduled filghts based on origin and date */
 proc freq data=oct16;
-	tables Origin*FlightDate / out=total;
+	tables Origin*FlightDateUTC / out=total;
 run;
 /* Sorting the data sets in preparation for merge */
 data cancel;
@@ -27,23 +27,23 @@ data total;
 	rename count = totalcount;
 run;
 proc sort data=cancel;
-	by Origin FlightDate;
+	by Origin FlightDateUTC;
 run;
 proc sort data=total;
-	by Origin FlightDate;
+	by Origin FlightDateUTC;
 run;
 /* Combining both cancelled and total counts,
    and calculating the percent of flight cancellations
    over total scheduled departures. */
 data combined;
 	merge cancel total;
-	by Origin FlightDate;
+	by Origin FlightDateUTC;
 	cancelpct = cancelcount/totalcount;
 run;
 /* Calculate the mean of cancellation percentages across
    all U.S. airports by day and weighted by schedule departures. */
 proc means data=combined;
-	class FlightDate;
+	class FlightDateUTC;
 	var cancelpct;
 	weight totalcount;
 	output out=means(drop=_type_ _freq_) mean= median= std= q1= q3= / autoname;
