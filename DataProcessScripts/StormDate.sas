@@ -57,5 +57,5 @@ proc sgplot data=means;
 	histogram cancelpct_mean;
 	density cancelpct_mean;
 run;
-/* It would appear that October 7, 2016, is the day that
+/* It would appear that October 6, 2016, is the day that
    Hurricane Matthew first made its impact across U.S. airports. */
