@@ -8,10 +8,9 @@
  * on the site, distributed under Open Database License (ODbL)    *
  * v1.0.     												      *
  * ************************************************************** */
-/* NOTE: If batch processing, use a macro function. Otherwise,
-   simply change the import and export filenames. */
+/* NOTE: If batch processing, use a macro function. */
 /* Import BTS on-time performance file */
-proc import datafile='~/STA 160/Data/Sept 2008.csv' out=sept08 dbms=csv;
+proc import datafile='~/STA 160/Data/OCT16BTS.csv' out=oct16 dbms=csv;
 run;
 /* Check contents of the newly imported file */
 proc contents varnum;
@@ -19,8 +18,8 @@ run;
 /* The departure and arrival times were imported as characters.
    The following code identifies the time values as HHMM, so 
    SAS knows it is a time value. */
-data sept08;
-	set sept08;
+data oct16;
+	set oct16;
 	DepTimeAdj = input(DepTime,HHMM.);
 	ArrTimeAdj = input(ArrTime,HHMM.);
 	drop DepTime ArrTime;
@@ -36,25 +35,25 @@ run;
 proc sort data=airports;
 	by origin;
 run;
-proc sort data=sept08;
+proc sort data=oct16;
 	by origin;
 run;
 /* Match-merge BTS and airports file, dropping missing airports.
    (The airports file included many airports around the world
    that was not in our BTS file, since BTS only has U.S. airports) */
-data sept08;
-	merge sept08 (in = insept08) airports (in = inairports);
+data oct16;
+	merge oct16 (in = inoct16) airports (in = inairports);
 	by origin;
-	if insept08 and inairports;
+	if inoct16 and inairports;
 	drop name city country icao dst dstbase type source;
 	rename lat=DepLat long=DepLong alt=DepAlt offset=DepOffset;
 run;
 /* Printing first 15 observations to check if everything was done correctly. */
-proc print data=sept08(obs=15);
+proc print data=oct16(obs=15);
 run;
 /* From UTC offset, change local time to UTC time by adding the corresponding hours. */
-data sept08;
-	set sept08;
+data oct16;
+	set oct16;
 	DepOffsetRev = DepOffset * 100 * -1;
 	DepUTC = DepTime + DepOffsetRev;
 run;
@@ -66,20 +65,38 @@ run;
 proc sort data=airports;
 	by dest;
 run;
-proc sort data=sept08;
+proc sort data=oct16;
 	by dest;
 run;
-data sept08;
-	merge sept08 (in = insept08) airports (in = inairports);
+data oct16;
+	merge oct16 (in = inoct16) airports (in = inairports);
 	by dest;
-	if insept08 and inairports;
+	if inoct16 and inairports;
 	drop name city country icao dst dstbase type source;
 	rename lat=ArrLat long=ArrLong alt=ArrAlt offset=ArrOffset;
 run;
-data sept08;
-	set sept08;
+data oct16;
+	set oct16;
 	ArrOffsetRev = ArrOffset * 100 * -1;
 	ArrUTC = ArrTime + ArrOffsetRev;
 run;
+/* Date and time adjustment - previously did not account for date change.
+   1. Should rewrite the code to concatenate date and time, then adjust
+   for UTC offset.
+   2. Discovered the time formatting did not work. Manually adjusted for
+   date. Appears to be a SAS Studio problem. */
+data oct16;
+	set oct16;
+	FlightDateUTC = intnx('day',FlightDate,0);
+	if DepUTC > 2400 then do;
+		DepUTC = DepUTC - 2400;
+		FlightDateUTC = intnx('day',FlightDate,1);
+		end;
+	if DepUTC < 0 then do;
+		DepUTC = DepUTC + 2400;
+		FlightDateUTC = intnx('day',FlightDate,-1);
+		end;
+	format FlightDateUTC date.;
+run;
 /* Export result as comma-separated file */
-%ds2csv (data=sept08, runmode=b, csvfile='~/STA 160/Data/SEPT08UTC.csv');
+%ds2csv (data=oct16, runmode=b, csvfile='~/STA 160/Data/oct16UTC.csv');
