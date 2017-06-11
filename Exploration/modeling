@@ -1,0 +1,35 @@
+library(randomForest)
+library(spdep)
+set.seed(123)
+indicate = sample(seq_len(nrow(SandyMerged)),size = 0.8*nrow(SandyMerged))
+train = SandyMerged[indicate,]
+test = SandyMerged[-indicate,]
+mod = glm(Cancelled ~ UniqueCarrier + DepDistanceToStorm + ArrDistanceToStorm + UTCDayofMonth +
+            UTCDepHour + Nature + Wind.WMO. + Pres.WMO., data= train,family = binomial(link = "logit"))
+test$predict = predict(mod,test)
+result = table(test$Cancelled,predict > .5)
+(result[1] + result[4]) / nrow(test)
+
+##Random Forrest
+extractFeatures = function(data){
+  features = c("UniqueCarrier",
+               "DepDistanceToStorm",
+               "ArrDistanceToStorm",
+               "UTCDayofMonth",
+               "UTCDepHour",
+               "Nature",
+               "Wind.WMO.",
+               "Pres.WMO.")
+  fea = data[,features]
+  fea$UniqueCarrier = as.factor(fea$UniqueCarrier)
+  fea$Nature = as.factor(fea$Nature)
+  return(fea)
+}
+set.seed(123)
+modrf = randomForest(extractFeatures(train),as.factor(train$Cancelled),ntree = 1000,importance = T)
+test$predict = predict(modrf,extractFeatures(test))
+accuracy = sapply(1:nrow(test),function(i){
+  ifelse(test$Cancelled[i] == test$predict[i], 1,0)
+})
+mean(accuracy)
+table(test$Cancelled,test$predict == "1")
