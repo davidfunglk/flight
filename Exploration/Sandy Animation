@@ -14,14 +14,17 @@ airportsdat = read.csv("https://raw.githubusercontent.com/jpatokal/openflights/m
                        col.names = c("ID","Name","City","Country","IATA","ICAO",
                                      "Lat","Lon","Altitude","Timezone","DST","Tz","Type","Source"))
 load('HurricaneSandy.rda')
-sandy = read.csv("Year.2012.ibtracs_all.v03r09.csv",skip = 1)
-sandy = sandy[-1,]
-sandy = sandy[which(sandy$Name %in% 'SANDY'),]
+hur2012 = read.csv("Year.2012.ibtracs_all.v03r09.csv",skip = 1)
+hur2012 = hur2012[-1,]
+sandy = hur2012[which(hur2012$Name %in% 'SANDY'),]
 sandy = sandy[which(sandy$ISO_time %in% unique(SandyMerged$DepSixHourBlock)),]
 sandy$ISO_time = droplevels(sandy$ISO_time)
 cancel_rate = aggregate(SandyMerged$Cancelled,list(SandyMerged$Origin,SandyMerged$DepSixHourBlock),mean)
 cancel_rate = merge(cancel_rate, airportsdat, by.x = c("Group.1"), by.y = c("IATA"))
 cancel_rate_hubs = cancel_rate[which(cancel_rate$Group.1 %in% allAirports),]
+cancel_rate_hubs = droplevels(cancel_rate_hubs)
+#I am going to show only the medium and large hubs on the animation map.
+
 
 #Plot the animation of how Sandy is affecting the airports.
 geo = list(
@@ -42,16 +45,55 @@ points = bind_cols(sandy,points)
 
 plot_geo(locationmode = "USA-states") %>%
   add_markers(
-    data = cancel_rate, x = ~Lon, y = ~Lat, text = ~Name, frame = ~Group.2,
-    hoverinfo = "text", alpha = 0.5, color = ~x, colors = c("green","red")
+    data = cancel_rate_hubs, x = ~Lon, y = ~Lat, text = ~Name, frame = ~Group.2,
+    hoverinfo = "text", alpha = 0.5, color = ~x, colors = c("green","yellow","orange","red","maroon")
   ) %>% 
   add_markers(
-    data = points, x = ~LON, y = ~LAT, frame = ~ISO_time, colors = c("black"), alpha = 0.3, size = ~INTENSITY
+    data = points, x = ~LON, y = ~LAT, frame = ~ISO_time, alpha = 0.3, size = ~INTENSITY, 
+    color = ~'Cancellation Rate'
   ) %>%
   layout(
     title = paste("Sandy and Airports' Cancellation Rate"), geo = geo, showlegend = FALSE
   ) %>%
-  animation_opts(1000, easing = "elastic",redraw = T
+  animation_opts(500, easing = "elastic",redraw = T
+  ) %>%
+  animation_slider(
+    currentvalue = list(prefix = "Time Block ", font = list(color="Black"))
+  )
+
+
+#########################IKE######################################
+load("KISMerged.rda")
+KatrinaMerged = KISMerged[which(KISMerged$Name == "KATRINA"),]
+IkeMerged = KISMerged[which(KISMerged$Name == "IKE"),]
+hur2008 = read.csv("Year.2008.ibtracs_all.v03r09.csv",skip = 1)
+hur2008 = hur2008[-1,]
+ike = hur2008[which(hur2008$Name %in% 'IKE'),]
+ike = ike[which(ike$ISO_time %in% unique(IkeMerged$DepSixHourBlock)),]
+ike$ISO_time = droplevels(ike$ISO_time)
+cancel_rate_ike = aggregate(IkeMerged$Cancelled,list(IkeMerged$Origin,IkeMerged$DepSixHourBlock),mean)
+cancel_rate_ike = merge(cancel_rate_ike, airportsdat, by.x = c("Group.1"), by.y = c("IATA"))
+cancel_rate_ike_hubs = cancel_rate_ike[which(cancel_rate_ike$Group.1 %in% allAirports),]
+cancel_rate_ike_hubs$Group.2 = droplevels(cancel_rate_ike_hubs$Group.2)
+points_ike = readOGR("al092008_position.shp")
+points_ike = points_ike[which(points_ike$HHMM %in% c('0000','0600','1200','1800')),]
+ike = as.data.frame(ike)
+points_ike = as.data.frame(points_ike)
+points_ike = bind_cols(ike,points_ike)
+
+plot_geo(locationmode = "USA-states") %>%
+  add_markers(
+    data = cancel_rate_ike_hubs, x = ~Lon, y = ~Lat, text = ~Name, frame = ~Group.2,
+    hoverinfo = "text", alpha = 0.5, color = ~x, colors = c("green","yellow","orange","red","maroon")
+  ) %>% 
+  add_markers(
+    data = points_ike, x = ~LON, y = ~LAT, frame = ~ISO_time, alpha = 0.3, size = ~INTENSITY, 
+    color = ~'cancellation rate'
+  ) %>%
+  layout(
+    title = paste("Ike and Airports' Cancellation Rate"), geo = geo, showlegend = FALSE
+  ) %>%
+  animation_opts(500, easing = "elastic",redraw = T
   ) %>%
   animation_slider(
     currentvalue = list(prefix = "Time Block ", font = list(color="Black"))
