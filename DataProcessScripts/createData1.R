@@ -66,48 +66,57 @@ deg2rad = function (deg) {
   return(deg * (pi/180))
 }
 
+#Input DataFile
 #Load October
-df201210 = read_data_from_BTS("/media/sf_Windows/FlightData/FD201210.csv")
+processStorm = function(dataFile) {
+  stormdf = read_data_from_BTS(dataFile)
 
-#Identify Lon and Lat as well as timezone.
-df= getGpsLocation(df201210)
+  #Identify Lon and Lat as well as timezone.
+  df= getGpsLocation(stormdf)
 
-df$DepDateTime = apply(df[,c("FlightDate","CRSDepTime")], 1,convertToUTC)
+  df$DepDateTime = apply(df[,c("FlightDate","CRSDepTime")], 1,convertToUTC)
 
-cols =  paste0("UTC",c("Year", "Month","DayofMonth",
+  cols =  paste0("UTC",c("Year", "Month","DayofMonth",
                        "DayOfWeek","DepHour","CRSDepTime"))
-df[cols] = NA
+  df[cols] = NA
 
-for(timezone in c("US/Hawaii","US/Eastern","US/Central",
+  for(timezone in c("US/Hawaii","US/Eastern","US/Central",
                                                   "US/Mountain","US/Pacific","US/Alaska")){
-  date = strptime(df$DepDateTime[df$`Origin Timezone` == timezone], 
+    date = strptime(df$DepDateTime[df$`Origin Timezone` == timezone], 
                   format="%Y-%m-%d %H%M", tz = timezone)
-  date = with_tz(date, tzone = 'UTC')
-  newdf = data.frame(Year = year(date),Month = month(date), Day = day(date),
+    date = with_tz(date, tzone = 'UTC')
+    newdf = data.frame(Year = year(date),Month = month(date), Day = day(date),
              DayOfWeek = weekdays(date), Hour = hour(date), Time = strftime(date, format="%Y-%m-%d %H:%M:%S"))
-  newdf$Time = as.character(newdf$Time)
-  newdf$DayOfWeek =as.character(newdf$DayOfWeek)
-  df[df$`Origin Timezone` == timezone,cols] = newdf
+    newdf$Time = as.character(newdf$Time)
+    newdf$DayOfWeek =as.character(newdf$DayOfWeek)
+    df[df$`Origin Timezone` == timezone,cols] = newdf
+  }
+
+  #Put time in blocks
+  utcTimes = strptime(df$UTCCRSDepTime, format="%Y-%m-%d %H:%M:%S", tz = 'UTC')
+  SixHourBlock = cut(utcTimes, breaks = "6 hour")
+  df$DepSixHourBlock = SixHourBlock 
+  return(df)
 }
+sandy = processStorm('/media/sf_Windows/FlightData/hurricaneSandy.csv')
+katrina = processStorm('/media/sf_Windows/FlightData/hurricaneKatrina.csv')
+ike = processStorm('/media/sf_Windows/FlightData/hurricaneIke.csv')
 
-#Put time in blocks
-utcTimes = strptime(df$UTCCRSDepTime, format="%Y-%m-%d %H:%M:%S", tz = 'UTC')
-SixHourBlock = cut(utcTimes, breaks = "6 hour")
-df$DepSixHourBlock = SixHourBlock 
-
+bigData = rbind(sandy,katrina, ike)
 #Merge with NOAA
-hurricaneTrack = read.csv("/home/kavi/Desktop/hurricaneTrack.csv")
-Sandy = hurricaneTrack[hurricaneTrack$Name == "SANDY",]
+AtlanticHurricanes = read.csv("/media/sf_Windows/AtlanticHurricanes.csv", stringsAsFactors = FALSE)
+
+KIS = AtlanticHurricanes[AtlanticHurricanes$Name %in% c("SANDY","KATRINA","IKE"),]
 #Grab days that's on Sandy
-SandyDays = df[df$DepSixHourBlock %in% Sandy$ISO_time,]
+KISDays = bigData[bigData$DepSixHourBlock %in% KIS$ISO_time,]
 
 #Do merge 
 library(sqldf)
-SandyMerged = sqldf("SELECT * FROM SandyDays s LEFT JOIN Sandy h ON s.DepSixHourBlock = h.ISO_time")
-DepDistanceToStorm = getDistanceFromLatLonInKm(SandyMerged$`Origin Lat`,SandyMerged$`Origin Lon`,
-                                            SandyMerged$Latitude, SandyMerged$Longitude)
-ArrDistanceToStorm = getDistanceFromLatLonInKm(SandyMerged$`Dest Lat`,SandyMerged$`Dest Lon`,
-                                               SandyMerged$Latitude, SandyMerged$Longitude)
-SandyMerged$DepDistanceToStorm = DepDistanceToStorm
-SandyMerged$ArrDistanceToStorm = ArrDistanceToStorm
-save(SandyMerged, file = "HurricaneSandy.rda")
+KISMerged = sqldf("SELECT * FROM KISDays s LEFT JOIN KIS  h ON s.DepSixHourBlock = h.ISO_time")
+DepDistanceToStorm = getDistanceFromLatLonInKm(KISMerged$`Origin Lat`,KISMerged$`Origin Lon`,
+                                            KISMerged$Latitude, KISMerged$Longitude)
+ArrDistanceToStorm = getDistanceFromLatLonInKm(KISMerged$`Dest Lat`, KISMerged$`Dest Lon`,
+                                               KISMerged$Latitude, KISMerged$Longitude)
+KISMerged$DepDistanceToStorm = DepDistanceToStorm
+KISMerged$ArrDistanceToStorm = ArrDistanceToStorm
+save(KISMerged, file = "KISMerged.rda")
