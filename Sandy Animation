@@ -1,0 +1,58 @@
+library(plotly)
+library(dplyr)
+library(rgdal)
+
+large_hubs = c('ATL','LAX','ORD','DFW','JFK','DEN','SFO','CLT','LAS','PHX','MIA',
+               'IAH','SEA','MCO', 'EWR','MSP','BOS','DTW','PHL','LGA','FLL','BWI',
+               'DCA','MDW','SLC','IAD','SAN','HNL','TPA','PDX')
+medium_hubs = c('DAL', 'STL', 'HOU', 'AUS', 'BNA', 'OAK', 'MSY', 'MCI',
+                'RDU','SNA','SJC','SMF','SJU','RSW','SAT','CLE',
+                'PIT', 'IND', 'CMH', 'MKE', 'OGG','PBI', 'CVG','BDL','JAX','ANC',
+                'BUF','ABQ','ONT','OMA')
+allAirports = c(large_hubs, medium_hubs)
+airportsdat = read.csv("https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat", header = F,
+                       col.names = c("ID","Name","City","Country","IATA","ICAO",
+                                     "Lat","Lon","Altitude","Timezone","DST","Tz","Type","Source"))
+load('HurricaneSandy.rda')
+sandy = read.csv("Year.2012.ibtracs_all.v03r09.csv",skip = 1)
+sandy = sandy[-1,]
+sandy = sandy[which(sandy$Name %in% 'SANDY'),]
+sandy = sandy[which(sandy$ISO_time %in% unique(SandyMerged$DepSixHourBlock)),]
+sandy$ISO_time = droplevels(sandy$ISO_time)
+cancel_rate = aggregate(SandyMerged$Cancelled,list(SandyMerged$Origin,SandyMerged$DepSixHourBlock),mean)
+cancel_rate = merge(cancel_rate, airportsdat, by.x = c("Group.1"), by.y = c("IATA"))
+cancel_rate_hubs = cancel_rate[which(cancel_rate$Group.1 %in% allAirports),]
+
+#Plot the animation of how Sandy is affecting the airports.
+geo = list(
+  scope = 'north america',
+  projection = list(type = 'azimuthal equal area'),
+  showland = TRUE,
+  landcolor = toRGB("gray95"),
+  countrycolor = toRGB("gray80")
+)
+
+#Read the shapefile.
+area = readOGR("al182012_radii.shp")
+points = readOGR("al182012_pts.shp")
+points = points[which(points$HHMM %in% c('0000','0600','1200','1800')),]
+sandy = as.data.frame(sandy)
+points = as.data.frame(points)
+points = bind_cols(sandy,points)
+
+plot_geo(locationmode = "USA-states") %>%
+  add_markers(
+    data = cancel_rate, x = ~Lon, y = ~Lat, text = ~Name, frame = ~Group.2,
+    hoverinfo = "text", alpha = 0.5, color = ~x, colors = c("green","red")
+  ) %>% 
+  add_markers(
+    data = points, x = ~LON, y = ~LAT, frame = ~ISO_time, colors = c("black"), alpha = 0.3, size = ~INTENSITY
+  ) %>%
+  layout(
+    title = paste("Sandy and Airports' Cancellation Rate"), geo = geo, showlegend = FALSE
+  ) %>%
+  animation_opts(1000, easing = "elastic",redraw = T
+  ) %>%
+  animation_slider(
+    currentvalue = list(prefix = "Time Block ", font = list(color="Black"))
+  )
