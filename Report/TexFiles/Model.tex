@@ -1,0 +1,7 @@
+% !TEX root = main.tex
+
+Our motivation for creating a prediction model was to be able to predict the percentage of cancellations at the next 6 hour interval of the hurricane based off the distance away from the hurricane center. We believe that such prediction will help airlines maybe further away to better allocate their resources and be prepared for the storm. (WHY? HOW?) \\
+
+The most intuitive model we have for such problem was to use logistic regression adjusting for distance away from hurricane center, wind speed, atmospheric pressure, departure hour, and month of the year. However, we realize that a logistic model would not work well here due to the spatial and temporal dependence of the response variable, which violates the i.i.d assumption of the response variable. \\ 
+
+We tried looking 
