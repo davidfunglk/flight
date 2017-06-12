@@ -16,6 +16,16 @@
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage[colorinlistoftodos]{todonotes}
+\usepackage{hyperref}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
+ 
+\urlstyle{same}
 
 \usepackage{fancyhdr} % Required for custom headers
 \usepackage{lastpage} % Required to determine the last page for the footer
@@ -54,7 +64,6 @@
 \renewcommand\footrulewidth{0.4pt} % Size of the footer rule
 
 \setlength\parindent{0pt} % Removes all indentation from paragraphs
-
 
 
 \begin{document}
@@ -100,17 +109,26 @@
 %--------------------------------------------------------------
 %Project Start
 %--------------------------------------------------------------
+\section{Abstract} \label{sec:Abstract}
 \section{Introduction} \label{sec:Intro}
 
-\input{intro.tex}
+\input{./TexFiles/intro.tex}
 
 \section{Description of Data} \label{sec:Descript} 
+
 \subsection{Data Preprocessing}
-\input{DataDescription.tex}
+\input{./TexFiles/DataDescription.tex}
+
 \subsection{Data Exploration}
-\input{DataExploration.tex}
+\input{./TexFiles/DataExploration.tex}
 
-\section{Method}
+\section{Model} \label{sec:Model}
 
-\section{Conclusion}
+\subsection{Limitations}
+
+\section{Conclusion} \label{sec:Conclusion}
+
+\section{Project Reflections} \label{sec:Refelections}
+
+\section{Code Appendix} \label{sec:Code Appendix} 
 \end{document}

@@ -1,0 +1,90 @@
+% !TEX root = main.tex
+Large and medium hubs are those as defined in \href{https://en.wikipedia.org/wiki/List_of_the_busiest_airports_in_the_United_States}{Wikipedia list of the busiest airports}. The list is based off FAA standards and seem reliable. \\
+
+\subsubsection{Exploring the NOAA Storm Data}
+
+\vskip -4ex
+\begin{figure}[H]
+\includegraphics[width=1\linewidth]{{"./Images/HurricaneInfoPlot1"}.png}
+\vskip -6ex
+\caption{Left: Heatmap of Hurricanes from 2005-2015. Right: Storm track for the three storms studied.}
+\end{figure}
+
+From the figure above, we see that Atlantic hurricanes affect primarily the Central and Eastern parts of the US. Hurricane Katrina and Hurricane Ike went through Central US, while Hurricane Sandy trailed along the east coast. 
+
+\begin{table}[H]
+\caption{Hurricanes Characteristics by Year}
+\label{Hurricanes Characteristics by Year}
+\begin{tabular}{@{}l|lllllllllll@{}}
+\toprule
+Year & 2005 & 2006 & 2007 & 2008 & 2009 & 2010 & 2011 & 2012 & 2013 & 2014 & 2015 \\ \midrule
+Num of Hurricanes &  31 & 10 &   17  &  17 &  11 &  20  & 20 &  19  & 15 &   9  &  12 \\
+Max Wind Speed & 160 & 105 & 150 & 135 & 115 & 135 & 120 & 100 &  80 & 125 & 135 \\ 
+Median Wind Speed & 45 & 45 & 35 & 45 & 35 & 40  & 45 &  45  & 35  & 40 &  35\\  
+
+\bottomrule
+\end{tabular}\\
+\caption{Hurricane Characteristics by Month 2005-2015}
+\centering
+\label{Hurricane Characteristics by Month}
+\begin{tabular}{@{}l|lllllllllll@{}}
+\toprule
+Month & 1 & 5 &  6 & 7 & 8  & 9 & 10 & 11 & 12 \\ \midrule
+Num of Hurricanes & 1 & 7 & 14 & 24 & 51 & 67 & 41 & 10 & 4 \\
+Max Wind Speed & 55 & 65 & 80 & 140 & 150 & 155 & 160 & 125 & 75 \\
+Median Wind Speed & 45 & 35 & 35 & 40 & 40 & 45 & 40 & 45 & 45 \\ 
+\bottomrule
+\end{tabular}
+\end{table}
+
+Between 2005 to 2015, there were 181 hurricanes recorded by NOAA. The year 2005 and months August to October has the most number of hurricane observations. From table 1,2005 has the highest windspeed probably from Hurricane Katrina.  After 2005, most hurricanes falls under the category 4 (Windspeed 130-156mph) and 3 (Windspeed 111-129mph) region. From table 2, we see that not only do August to October witness the most hurricanes, but also more destructive hurricanes. From the median perspective, there is not too much fluctuation across years and months. \\
+
+\subsubsection{Exploring the Ontime Performance Data} 
+
+\subsubsection{Exploring the Relationship Between Ontime Performance and Storm}
+\vskip -2ex
+
+\begin{figure}[H]
+\begin{subfigure}{\textwidth}
+  \centering
+  \includegraphics[width=.4\linewidth]{{"./Images/BubblePlotKatrina"}.png}
+  \includegraphics[width=.4\linewidth]{{"./Images/BubblePlotIke"}.png} 
+  \includegraphics[width=.4\linewidth]{{"./Images/BubblePlotSandy"}.png} 
+\end{subfigure}%
+\caption{Bubble Plots of Katrina, Ike, Sandy}
+\end{figure}
+
+A bubble plot is plotted to explore the relationship between departure distance from storm center against percentage of cancellation. The size of the bubble measures the average delay at different airport locations. Each color of the bubble represent different days of the storm available in the NOAA data. An interactive version of the plot allowing the option to hover over and see the actual values are available in the links below. Only large and medium airport hubs in the Central and Eastern timezones have been used for the plots to avoid small airports with little flights showing up with high cancellation. \\
+
+From the plots, we see that Sandy seem to have more hubs experiencing cancellations than Ike and Katrina. By the color of the bubble, we can identify the days that the hurricanes cause the highest cancellation with respect to the hub's position to the storm center. With the exception of HOU airport on day 15 for Ike, most airports experience higher cancellation when their proximity to hurricane center increase, as we would expect. The large the bubble indicates higher average delay for the hub, but from the plot we see that most of the bubble do not grow in size with decrease in departure distance to the center of the storm. Also some airports with 100\% cancellation weren't shown in the plot since they would have no delay information available to generate the size of the bubble, but we have noted them down in the table 3. 
+
+\begin{table}[H]
+\centering
+\caption{Hurricanes 100\% Cancellation}
+\label{Hurricanes 100 Cancellation}
+\begin{tabular}{@{}l|lllllllllll@{}}
+\toprule
+Hurricane & Hub(Days) \\ \midrule
+IKE & MSY(1,2,3), HOU(13,14), IAH (13) \\
+KATRINA & MSY(29,30,31) \\
+SANDY & EWR(30,31), JFK(30), LGA (30,31)\\
+\bottomrule
+\end{tabular}\\
+\end{table}
+
+For Ike the cancellation that resulted on days 1-3 was due to another hurricane striking right before Ike at the end of August. Overall, from the bubble plot it seems like hurricane that strike along the East Coast will lead to more cancellations than hurricane moving inland from the southern tip as illustrated by the storm track of Ike and Katrina. Also, there is no noticeably bad delays resulting from hurricane weather. Most of the delays are under an hour on average. Furthermore, we see that most cancellation activity occur within 1000 miles of hurricane center. 
+
+\begin{figure}[H]
+\begin{subfigure}{\textwidth}
+  \centering
+  \includegraphics[width=.5\linewidth]{{"./Images/SandyMap"}.png}
+  \includegraphics[width=.5\linewidth]{{"./Images/IkeMap"}.png} 
+\end{subfigure}%
+\caption{Animated Map of Sandy and Ike}
+\end{figure}
+
+Focusing only on the medium and large hubs as in the case of the bubble plots, we also animated the storm track through the US and see the percentage of cancellation rates. The plots shown in figure 3 shows the first time the hurricane comes into contact with land. Only Sandy and Ike were plotted because the shapefile data only has information since 2008. \\
+
+When Sandy hits the eastern shores, we can see the all the hubs in the area going toward red. However, when Ike hits, most of the East Coast remain green and we see some points in the West turning red. Our conjecture for the reason that the West have cancellation while the East remain green was due to the time difference. 6 AM UTC is 2 AM EST in the morning and around 11 PM in PST. From data exploration and research, we know that almost all the airports reduce or have no departures after 12 AM midnight to 5 AM in the morning, explaining why the East have little to no cancellations. However due to the storm, for flights departing from the West Coast going toward the East, they seem to end up having increased cancellations.  \\
+
+After studying the patterns throughout the animation, we also come to the same conclusion as the bubble plots in that hurricanes coming up from the South to Central US tend to have result in less cancellation than a hurricane striking the East Coast.  
