@@ -8,6 +8,9 @@
 /* Import datafile */
 proc import datafile='~/STA 160/Data/OCT16UTC.csv' out=oct16 dbms=csv;
 run;
+data oct16;
+	set oct16(where=('30SEP2016'd<FlightDateUTC<'01NOV2016'd));
+run;
 /* Count all cancelled flights based on origin and date */
 proc freq data=oct16;
 	where Cancelled = 1;
@@ -57,5 +60,8 @@ proc sgplot data=means;
 	histogram cancelpct_mean;
 	density cancelpct_mean;
 run;
-/* It would appear that October 6, 2016, is the day that
+proc sort data=means;
+	by descending cancelpct_mean;
+run;
+/* It would appear that October 7, 2016, is the day that
    Hurricane Matthew first made its impact across U.S. airports. */
