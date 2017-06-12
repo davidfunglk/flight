@@ -1,5 +1,5 @@
 % !TEX root = main.tex
-Large and medium hubs are those as defined in \href{https://en.wikipedia.org/wiki/List_of_the_busiest_airports_in_the_United_States}{Wikipedia list of the busiest airports}. The list is based off FAA standards and seem reliable. An interactive version of the bubble plot allowing the option to hover over and see the actual values and the animation of the map are available in the links in Bibliography \ref{sec:Bibliography}.\\
+Large and medium hubs are those as defined in \href{https://en.wikipedia.org/wiki/List_of_the_busiest_airports_in_the_United_States}{Wikipedia list of the busiest airports}. The list is based off FAA standards since 2014 and seem reliable enough. An interactive version of the bubble plot allowing the option to hover over and see the actual values and the animation of the map are available in the first link of the Bibliography \ref{sec:Bibliography}.\\
 
 \subsubsection{Exploring the NOAA Storm Data}
 
@@ -65,7 +65,7 @@ Between 2005 to 2015, there were 181 hurricanes recorded by NOAA. The year 2005 
 \caption{Exploring Delays and Cancellation for Sandy}
 \end{figure}
 
-To begin with, the tickmarks in some of the plots are weird because for some reason SaS weren't able to order the values. To get an ordering, we added 100 to the values. \\
+To begin with, the tickmarks in some of the plots are weird because for some reason SaS weren't able to order the values. To get an ordering, we added 100 to the values. So 101 - 115 in days mean day 1-15 of the month and 100-123 in hours mean 0-23 in hour. \\
 
 From these plots, we can see that delays and cancellations were consistent during Hurricane Katrina. However, in Ike and certainly Sandy, there were a lot less delays on days where there were a lot of cancellations. This would suggest that airlines are simply cancelling flights during the storm. In Sandy, the range of total cancelled flights went as high as 800 on the scale.
 
@@ -81,7 +81,7 @@ From these plots, we can see that delays and cancellations were consistent durin
 
 A bubble plot is plotted to explore the relationship between departure distance from storm center against percentage of cancellation. The size of the bubble measures the average delay at different airport locations. Each color of the bubble represent different days of the storm available in the NOAA data. Only large and medium airport hubs in the Central and Eastern timezones have been used for the plots to avoid small airports with little flights showing up with high cancellation. \\
 
-From the plots, we see that Sandy seem to have more hubs experiencing cancellations than Ike and Katrina. By the color of the bubble, we can identify the days that the hurricanes cause the highest cancellation with respect to the hub's position to the storm center. With the exception of HOU airport on day 15 for Ike, most airports experience higher cancellation when their proximity to hurricane center increase, as we would expect. The large the bubble indicates higher average delay for the hub, but from the plot we see that most of the bubble do not grow in size with decrease in departure distance to the center of the storm. Also some airports with 100\% cancellation weren't shown in the plot since they would have no delay information available to generate the size of the bubble, but we have noted them down in the table 3. 
+From the plots, we see that Sandy seem to have more hubs experiencing cancellations than Ike and Katrina. By the color of the bubble, we can identify the days that the hurricanes cause the highest cancellation with respect to the hub's position to the storm center. With the exception of HOU airport on day 15 for Ike, most airports experience higher cancellation when their proximity to hurricane center increase, as we would expect. The larger the bubble indicates higher average delay for the hub, but from the plot we see that most of the bubble do not grow in size with decrease in departure distance to the center of the storm. Also some airports with 100\% cancellation weren't shown in the plot since they would have no delay information available to generate the size of the bubble, but we have noted them down in the table 3. 
 
 \begin{table}[H]
 \centering
@@ -108,7 +108,7 @@ For Ike the cancellation that resulted on days 1-3 was due to another hurricane 
 \caption{Animated Map of Sandy and Ike}
 \end{figure}
 
-Focusing only on the medium and large hubs as in the case of the bubble plots, we also animated the storm track through the US and see the percentage of cancellation rates. The plots shown in figure 3 shows the first time the hurricane comes into contact with land. Only Sandy and Ike were plotted because the shapefile data only has information since 2008. \\
+Focusing only on the medium and large hubs as in the case of the bubble plots, we also animated the storm track through the US and see the percentage of cancellation rates. The plots shown in figure 3 shows the first time the hurricane comes into contact with land. Only Sandy and Ike were plotted because the shapefile data only has information starting from 2008. \\
 
 When Sandy hits the eastern shores, we can see the all the hubs in the area going toward red. However, when Ike hits, most of the East Coast remain green and we see some points in the West turning red. Our conjecture for the reason that the West have cancellation while the East remain green was due to the time difference. 6 AM UTC is 2 AM EST in the morning and around 11 PM in PST. From data exploration and research, we know that almost all the airports reduce or have no departures after 12 AM midnight to 5 AM in the morning, explaining why the East have little to no cancellations. However due to the storm, for flights departing from the West Coast going toward the East, they seem to end up having increased cancellations.  \\
 

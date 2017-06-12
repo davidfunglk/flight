@@ -1,6 +1,6 @@
 % !TEX root = main.tex
 \subsection{Motivation}
-In the following, we try to predict the probabilities that particular flights are going to be delayed based on different factors, such as distances between the airports and the center of the storm, the carrier of the flights, and the wind speed and pressure of the hurricane. We thought such prediction is interesting given that if airports can forecast the proportion of cancellations prior to the next 6 hour hurricane measurement, maybe they will be more prepared and can better allocate their resources. \\
+In the following, we try to predict the probabilities that particular flights are going to be cancelled based on different factors, such as distances between the airports and the center of the storm, the carrier of the flights, and the wind speed and pressure of the hurricane. We thought such prediction is interesting given that if airports can forecast the proportion of cancellations prior to the next 6 hour hurricane measurement, maybe they will be more prepared and can better allocate their resources. \\
 
 We use all data points from hurricane Katrina, Sandy, and Ike. We then divide it into 80\% training data and 20\% testing data. \\
 
@@ -13,7 +13,7 @@ We then decided to use a random forest model, since requires no distribution ass
 
 Our model becomes better at guessing the cancelled flights and we have a misclassification rate of only 1.87\%. 8\% of the flights are cancelled during days of the three hurricanes. See bottom chart of table 4 for confusion matrix of results. \\
 
-In the end, we also test our data with hurricane Dennis, which our training dataset does not include. We still manage to maintain a misclassification rate of 2.48\%. \\
+In the end, we also test our data with hurricane Dennis, which our training dataset does not include. We still manage to maintain a misclassification rate of 2.48\%. However, Hurricane Dennis itself contained a high proportion of non-cancellations and we didn't test on more hurricanes to verify if the random forest trained only on 3 storms will do well. 
 
 
 \begin{table}[H]
@@ -41,4 +41,4 @@ In the end, we also test our data with hurricane Dennis, which our training data
 \end{table}
 
 \subsection{Model Limitation} 
-We realize that analyzing the data of hurricane can be very challenging and complicated. In order to achieve a more accurate result, we should look into spatial-temporal models or time series autoregressive models. For example, we have read about the spatial and autoregressive models in determining the time lag effects and spatial effect of the dynamic hurricane. But learning about the knowledge in these analyses is beyond the scope of this project under the time constraint. We also didn't spend time tuning model parameters and doing cross-validation, since the bulk of our project was on exploring the dataset and we kind throw in a model last minute to see if there is anything interesting. Furthermore, we only combined 3 hurricanes as our data and its not a random sample either, so that might be problematic. Next time, if we do want to proceed with such analysis, maybe include all the hurricane data information. However to get the data for all the flight information will be a pain, since we need to manually click and download each month.
+We realize that analyzing the data of hurricane can be very challenging and complicated. In order to achieve a more accurate result, we should look into spatial-temporal models or time series autoregressive models. Maybe it's possible for us to add in a time lag to improve model performance. But learning about the knowledge in these analyses is beyond the scope of this project under the time constraint. We also weren't able to spend time tuning model parameters and doing cross-validation, since the bulk of our project was spent on exploring the dataset and we kind throw in a model last minute to see if there is anything interesting. Furthermore, we only combined 3 hurricanes as our data and its not a random sample either, so that might be problematic. Next time, if we do want to proceed with such analysis, maybe include all the hurricane data information. However to get the data for all the flight information will be a pain, since we need to manually click and download each month. Overally, our model can only be seen as an exploratory effort than something solid people can apply. 
