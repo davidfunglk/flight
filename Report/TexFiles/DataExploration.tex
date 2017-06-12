@@ -40,6 +40,16 @@ Median Wind Speed & 45 & 35 & 35 & 40 & 40 & 45 & 40 & 45 & 45 \\
 Between 2005 to 2015, there were 181 hurricanes recorded by NOAA. The year 2005 and months August to October has the most number of hurricane observations. From table 1,2005 has the highest windspeed probably from Hurricane Katrina.  After 2005, most hurricanes falls under the category 4 (Windspeed 130-156mph) and 3 (Windspeed 111-129mph) region. From table 2, we see that not only do August to October witness the most hurricanes, but also more destructive hurricanes. From the median perspective, there is not too much fluctuation across years and months. \\
 
 \subsubsection{Exploring the Ontime Performance Data} 
+\begin{figure}[H]
+\begin{subfigure}{\textwidth}
+  \centering
+  \includegraphics[width=.45\linewidth]{{"./Images/SandyExplorePlot1"}.png}
+  \includegraphics[width=.45\linewidth]{{"./Images/SandyExplorePlot2"}.png} 
+\end{subfigure}%
+\caption{Top Left: }
+\end{figure}
+
+
 
 \subsubsection{Exploring the Relationship Between Ontime Performance and Storm}
 \vskip -2ex
@@ -97,7 +107,7 @@ After studying the patterns throughout the animation, we also come to the same c
     \includegraphics[width=.45\linewidth]{{"./Images/ClustersIkeDay"}.png} 
   \includegraphics[width=.45\linewidth]{{"./Images/Clusters"}.png} 
 \end{subfigure}%
-\caption{Top Left: Cluster sizes on a regular day. Top Right: Cluster sizes on the day Sandy hit East Coast shores. Bottom Left: Cluster sizes on the day Ike hit Central shores. Bottom Right: Network Clusters}
+\caption{Top Left: Cancellation Cluster sizes on a regular day for Sandy. Top Right: Cancellation Cluster sizes on the day Sandy hit East Coast shores. Bottom Left: Cancellation Cluster sizes on the day Ike hit Central shores. Bottom Right: Igraph of Network Clusters}
 \end{figure}
 
-
+In the Igraph, the nodes are the airports and the edges are existing routes connecting them. By clustering the nodes, we can figure out how many airports with severe cancellation rate (more than 20\%) are connected to each other. These clusterization helps us understand how the effect of cancellation from one airport propagates to the others. The barplots show the maximum sizes of clustering at different times of the day when Ike and Sandy hits the US costals, comparing to normal day in the Sandy time range.  For Sandy, the clusters seem to be uniformly distributed as oppose to Ike, where seem more normally distributed. This is also consistent to our earlier claim that hurricane hitting the Eastern coastal will create a heavier effect on cancellation rates than hitting the Southern coastal regions.
