@@ -45,7 +45,7 @@
 % Set up the header and footer
 \pagestyle{fancy}
 \lhead{}
-\chead{Analysis on the Effect of Major Atlantic Hurricanes on Airport Network} % Top center header
+\chead{Analysis on the Effect of Atlantic Hurricanes on the US Airport Network} % Top center header
 \rhead{\firstxmark} % Top right header
 \lfoot{\lastxmark} % Bottom left footer
 \cfoot{} % Bottom center footer
@@ -82,7 +82,7 @@
 \HRule \\[1.5cm]
 
 \hfill \break \hfill \break \hfill \break
-\hfill \break \hfill \break \hfill \break 
+{ \huge \bfseries Analysis on the Effect of Atlantic Hurricanes on the US Airport Network}\\
 \hfill \break \hfill \break \hfill \break
 \hfill \break
 
@@ -104,12 +104,13 @@
 
 \input{intro.tex}
 
-\section{Description of Data} \label{sec:Descript}
-\input{DataDescription.tex}
+\section{Description of Data} \label{sec:Descript} 
 \subsection{Data Preprocessing}
+\input{DataDescription.tex}
+\subsection{Data Exploration}
+\input{DataExploration.tex}
 
 \section{Method}
 
 \section{Conclusion}
-
 \end{document}
