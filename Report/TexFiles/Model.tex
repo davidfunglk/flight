@@ -1,7 +1,44 @@
 % !TEX root = main.tex
+\subsection{Motivation}
+In the following, we try to predict the probabilities that particular flights are going to be delayed based on different factors, such as distances between the airports and the center of the storm, the carrier of the flights, and the wind speed and pressure of the hurricane. We thought such prediction is interesting given that if airports can forecast the proportion of cancellations prior to the next 6 hour hurricane measurement, maybe they will be more prepared and can better allocate their resources. \\
 
-Our motivation for creating a prediction model was to be able to predict the percentage of cancellations at the next 6 hour interval of the hurricane based off the distance away from the hurricane center. We believe that such prediction will help airlines maybe further away to better allocate their resources and be prepared for the storm. (WHY? HOW?) \\
+We use all data points from hurricane Katrina, Sandy, and Ike. We then divide it into 80\% training data and 20\% testing data. \\
 
-The most intuitive model we have for such problem was to use logistic regression adjusting for distance away from hurricane center, wind speed, atmospheric pressure, departure hour, and month of the year. However, we realize that a logistic model would not work well here due to the spatial and temporal dependence of the response variable, which violates the i.i.d assumption of the response variable. \\ 
+Our first intuition is to use a logistic regression model. However, the result is not very satisfying. It is very conservative and poor at predicting cancelled flights. It only makes 21 attempts in guessing the flights are going to be cancelled. See top chart of table 4 for confusion matrix of results. \\
 
-We tried looking 
+One reason that our model does very poor is because we violate the assumption of logistic regression that each observation in the data should be independent. However, as shown in the Igraph above, airports’ cancellation rate are dependent on each other. For example, when the storm hits Atlanta and causing a lot of cancellation, flights coming from San Francisco are going to be cancelled too. \\
+
+\subsection{Findings}
+We then decided to use a random forest model, since requires no distribution assumptions or need to take into account spatial autocorrelations. We included airlines, arrival and departure distances from the storm, nature of the storm, wind speed and pressure of the storm, and departure hour in our model. \\
+
+Our model becomes better at guessing the cancelled flights and we have a misclassification rate of only 1.87\%. 8\% of the flights are cancelled during days of the three hurricanes. See bottom chart of table 4 for confusion matrix of results. \\
+
+In the end, we also test our data with hurricane Dennis, which our training dataset does not include. We still manage to maintain a misclassification rate of 2.48\%. \\
+
+
+\begin{table}[H]
+\centering
+\begin{subtable}{.5\textwidth}
+\centering
+\begin{tabular}{@{}|c|c|c|c|@{}}
+\toprule
+\multicolumn{2}{|c|}{\multirow{2}{*}{Test Data}} & \multicolumn{2}{c|}{Actual} \\ \cmidrule(l){3-4} 
+\multicolumn{2}{|c|}{}                        & Not Cancelled          & Cancelled         \\ \midrule
+\multirow{2}{*}{Predicted}       & Not Cancelled        & 110942        & 0 \\ \cmidrule(l){2-4} 
+                                 & Cancelled       & 4659         & 21        \\ \bottomrule
+\end{tabular}
+
+\begin{tabular}{@{}|c|c|c|c|@{}}
+\toprule
+\multicolumn{2}{|c|}{\multirow{2}{*}{Dennis}} & \multicolumn{2}{c|}{Actual} \\ \cmidrule(l){3-4} 
+\multicolumn{2}{|c|}{}                        & Not Cancelled         &  Cancelled         \\ \midrule
+\multirow{2}{*}{Predicted}       & Not Cancelled       & 110700   	  & 242 \\ \cmidrule(l){2-4} 
+                                 & Cancelled       & 1921 		  & 2759 \\ \bottomrule
+\end{tabular}
+\end{subtable}
+\caption{Confusion Matrix for Random Forest with Testing Data and Hurricane Dennis}
+\label{Confusion_MLP}
+\end{table}
+
+\subsection{Model Limitation} 
+We realize that analyzing the data of hurricane can be very challenging and complicated. In order to achieve a more accurate result, we should look into spatial-temporal models or time series autoregressive models. For example, we have read about the spatial and autoregressive models in determining the time lag effects and spatial effect of the dynamic hurricane. But learning about the knowledge in these analyses is beyond the scope of this project under the time constraint. We also didn't spend time tuning model parameters and doing cross-validation, since the bulk of our project was on exploring the dataset and we kind throw in a model last minute to see if there is anything interesting. Furthermore, we only combined 3 hurricanes as our data and its not a random sample either, so that might be problematic. Next time, if we do want to proceed with such analysis, maybe include all the hurricane data information. However to get the data for all the flight information will be a pain, since we need to manually click and download each month.

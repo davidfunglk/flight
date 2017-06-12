@@ -152,7 +152,6 @@
 \section{Model} \label{sec:Model}
 \input{./TexFiles/Model.tex}
 
-\subsection{Limitations}
 
 \section{Conclusion} \label{sec:Conclusion}
 
@@ -259,6 +258,66 @@ processStorm = function(dataFile) {
   df$DepSixHourBlock = SixHourBlock 
   return(df)
 }
+\end{lstlisting}
+\begin{lstlisting}[language=R, caption=Animation Plot in R]
+#Animation Plot
+plot_geo(locationmode = "USA-states") %>%
+  add_markers(
+    data = cancel_rate_ike_hubs, x = ~Lon, y = ~Lat, text = ~Name, frame = ~Group.2,
+    hoverinfo = "text", alpha = 0.5, color = ~x, colors = c("green","yellow","orange","red","maroon")
+  ) %>% 
+  add_markers(
+    data = points_ike, x = ~LON, y = ~LAT, frame = ~ISO_time, alpha = 0.3, size = ~INTENSITY, 
+    color = ~'cancellation rate'
+  ) %>%
+  layout(
+    title = paste("Ike and Airports' Cancellation Rate"), geo = geo, showlegend = FALSE
+  ) %>%
+  animation_opts(500, easing = "elastic",redraw = T
+  ) %>%
+  animation_slider(
+    currentvalue = list(prefix = "Time Block ", font = list(color="Black"))
+  )
+ 
+#Clustering
+cluster = sapply(1:19,function(i){
+  routes[[i]]$Origin = factor(routes[[i]]$Origin)
+  routes[[i]]$Dest = factor(routes[[i]]$Dest)
+  airports = data.frame(name = delay_airport[[i]]$Group.1,congested = delay_airport[[i]]$congested)
+  paths = data.frame(from = routes[[i]]$Origin, to = routes[[i]]$Dest)
+  paths = paths[which(paths[,2] %in% airports$name),]
+  paths = paths[which(paths[,1] %in% airports$name),]
+  g = graph_from_data_frame(paths,vertices = airports)
+  V(g)$color = ifelse(airports$congested == 1,"red","green")
+  g = induced.subgraph(g,V(g)[V(g)$color %in% c("red")])
+  plot(g)
+  max(clusters(g)$csize)
+})
+ 
+p = ggplot(data = data15,aes(x = unique.cancel_rate_15.Group.2., y = cluster_15)) + 
+    geom_bar(stat = "identity") + ggtitle("The Maximum of Cluster Size at Different Time of OCT 15") +
+    xlab("Time") + ylab("Cluster Size") + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+p
+\end{lstlisting}
+\begin{lstlisting}[language=R, caption=Random Forest in R] 
+#Modeling
+extractFeatures = function(data){
+  features = c("UniqueCarrier",
+               "DepDistanceToStorm",
+               "ArrDistanceToStorm",
+               "UTCDayofMonth",
+               "UTCDepHour",
+               "Nature",
+               "Wind.WMO.",
+               "Pres.WMO.")
+  fea = data[,features]
+  fea$UniqueCarrier = as.factor(fea$UniqueCarrier)
+  fea$Nature = as.factor(fea$Nature)
+  return(fea)
+}
+set.seed(123)
+modrf = randomForest(extractFeatures(train),as.factor(train$Cancelled),ntree = 1000,importance = T)
+test$predict = predict(modrf,extractFeatures(test))
 \end{lstlisting}
 \lstlistoflistings
 \end{document}
