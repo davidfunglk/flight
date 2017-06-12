@@ -137,6 +137,9 @@
 %Project Start
 %--------------------------------------------------------------
 \section{Abstract} \label{sec:Abstract}
+
+The airport system are characterized by a network structure connecting different operation centers. In this report, we study the performance and resilience of US airports reacting to the extreme weather condition of hurricanes, by measuring how delay and cancellation rate propagates throughout time when different Atlantic hurricanes hits the US coastals. We focused our study on hurricane Katrina, Sandy, and Ike, category three to five hurricanes that directly hits onto the US. Our result suggests that when one of the major hubs is paralyzed, the effect can propagate, magnify and eventually involve a significant part of the network. Also, hurricanes striking along the eastern borders of the US will result in more cancellations in the airport network than those hitting the southern central borders, this is because more major hubs are concentrated in the East Coast. We also quantify the level of network congestion and cancellation rate and attempted at a prediction model of cancellations using the flight performance data. The random forest model results suggest that wind speed, followed by nature and distance were most indicative of probability of flight cancellation. 
+
 \section{Introduction} \label{sec:Intro}
 
 \input{./TexFiles/intro.tex}
@@ -154,10 +157,26 @@
 
 
 \section{Conclusion} \label{sec:Conclusion}
+The data sets for U.S. domestic flights are extremely large. Combining with hurricane data, it was quite a challenge to manage, subset, and analyze our data effectively. In addition, it was difficult to design a model that took into account the vast number of variables and dependencies within our data. Overall, we can tell that hurricanes with a path in Northeastern United States will have a bigger effect on flights than a hurricane going through Southeastern United States. This makes sense as there are generally more flights heading to and taking off from the major hubs in the East Coast (such as New York City). With bigger hurricanes, we can also identify with high certainty whether a flight will be cancelled. Smaller hurricanes present a challenge since they rarely hit mainland U.S., and even when they do, they rarely affect the flights. Overall, we would need to further explore the data with spatial analysis to create a more accurate model.
+
+\section{Bibliography} \label{sec:Bibliography}
+\begin{enumerate}
+\item \href{http://point.fungservices.com/flightanalysis}{Website with Animation and Interactive Plots}
+\item 
+\href{https://www.transtats.bts.gov/DL_SelectFields.asp?Table_ID=236&DB_Short_Name=On-Time}{On-time Performance Data of Flights}
+\item \href{https://www.ncdc.noaa.gov/ibtracs/index.php?name=wmo-data}{Hurricane Data}
+\item 
+\href{https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat}{Airport Location Information}
+\item \href{https://www.nature.com/articles/srep01159}{System Delay Propagation in the US Airport Network}
+\item
+\href{http://www.reuters.com/article/us-jetblue-airways-cancellation-analysis-idUSKBN0N50BF20150414}{ JetBlue Earliest to Cancel during Storms, Fewer Refunds Result}
+\item 
+\href{http://www.people.fas.harvard.edu/~zhukov/spatial.html}{Applied Spatial Statistics in R}
+\item \href{http://www.statisticssolutions.com/assumptions-of-logistic-regression/}{Assumptions of Logistic Regression}
+\end{enumerate}
 
 \section{Project Reflections} \label{sec:Reflections}
-The biggest challenge we have for this project was actually identifying and clarifying the question we want to answer and why any of this matters. We spend basically 9 out of the 10 weeks changing and revising our project to try to make it meaningful. Even up to the last minute, changes are being made to the project and we are constantly fighting with the question 'why it matters and to who?'. So if we learn anything in these 10 weeks, it was how important it is to have a well-define project to work with.  
-
+The biggest challenge we have for this project was actually identifying and clarifying the question we want to answer and why any of this matters. We spend basically 9 out of the 10 weeks changing and revising our project to try to make it meaningful. Even up to the last minute, changes are being made to the project and we are constantly fighting with the question 'why it matters and to who?'. So if we learn anything in these 10 weeks, it was how important it is to have a well-define project to work with. Since our project goals were so unclear, we weren't able to spent much on learning a new method, which was unfortunate. If we were to do a similar project in the future, we believe the goal should be to make sure everyone is on the same page with a well-define goal way early in the project so we can have as little revision as possible. Of course, working with real data and having to define a problem that is interesting not only to you but to stakeholders is a big challenge itself. 
 
 \section{Code Appendix} \label{sec:Code Appendix} 
 \begin{lstlisting}[language=R, caption=Data Merging in R]
@@ -318,6 +337,20 @@ extractFeatures = function(data){
 set.seed(123)
 modrf = randomForest(extractFeatures(train),as.factor(train$Cancelled),ntree = 1000,importance = T)
 test$predict = predict(modrf,extractFeatures(test))
+\end{lstlisting}
+\begin{lstlisting}[language=R, caption= Sample Code forBubble Plots in R] 
+p1 <- plot_ly(result[result$Name == "KATRINA",], x = ~averageDistanceToStorm, y = ~cancelledProp, 
+              type = 'scatter', mode = 'markers', size = ~averageDepDelay , color = ~DayofMonthLabel,
+              sizes = c(10, 50),
+              marker = list(opacity = 0.3, sizemode = 'diameter'),
+              colors= "RdYlBu",
+              hoverinfo = 'text',
+              text = ~paste('Airport:', ORIGIN,
+                            '<br> Day of Month:', DayofMonth,
+                            '<br>%of Cancelled Flights:', cancelledProp,
+                            '<br>Flights Scheduled for Airport:', proportionFlights,
+                            '<br>Average Departure Delay:', averageDepDelay))  %>% 
+  layout(title = 'Hurricane Katrina')
 \end{lstlisting}
 \lstlistoflistings
 \end{document}

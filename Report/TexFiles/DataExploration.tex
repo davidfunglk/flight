@@ -1,5 +1,5 @@
 % !TEX root = main.tex
-Large and medium hubs are those as defined in \href{https://en.wikipedia.org/wiki/List_of_the_busiest_airports_in_the_United_States}{Wikipedia list of the busiest airports}. The list is based off FAA standards and seem reliable. \\
+Large and medium hubs are those as defined in \href{https://en.wikipedia.org/wiki/List_of_the_busiest_airports_in_the_United_States}{Wikipedia list of the busiest airports}. The list is based off FAA standards and seem reliable. An interactive version of the bubble plot allowing the option to hover over and see the actual values and the animation of the map are available in the links in Bibliography \ref{sec:Bibliography}.\\
 
 \subsubsection{Exploring the NOAA Storm Data}
 
@@ -39,14 +39,14 @@ Median Wind Speed & 45 & 35 & 35 & 40 & 40 & 45 & 40 & 45 & 45 \\
 
 Between 2005 to 2015, there were 181 hurricanes recorded by NOAA. The year 2005 and months August to October has the most number of hurricane observations. From table 1,2005 has the highest windspeed probably from Hurricane Katrina.  After 2005, most hurricanes falls under the category 4 (Windspeed 130-156mph) and 3 (Windspeed 111-129mph) region. From table 2, we see that not only do August to October witness the most hurricanes, but also more destructive hurricanes. From the median perspective, there is not too much fluctuation across years and months. \\
 
-\subsubsection{Exploring the Ontime Performance Data} 
+\subsubsection{Exploring the Relationship Between Ontime Performance and Storm}
 \begin{figure}[H]
 \begin{subfigure}{\textwidth}
   \centering
   \includegraphics[width=.45\linewidth]{{"./Images/KatrinaExplorePlot1"}.png}
   \includegraphics[width=.45\linewidth]{{"./Images/KatrinaExplorePlot2"}.png} 
 \end{subfigure}%
-\caption{Exploring Delays in Katrina }
+\caption{Exploring Delay and Cancellation for Katrina }
 \end{figure}
 \begin{figure}[H]
 \begin{subfigure}{\textwidth}
@@ -54,7 +54,7 @@ Between 2005 to 2015, there were 181 hurricanes recorded by NOAA. The year 2005 
   \includegraphics[width=.45\linewidth]{{"./Images/IkeExplorePlot1"}.png}
   \includegraphics[width=.45\linewidth]{{"./Images/IkeExplorePlot2"}.png} 
 \end{subfigure}%
-\caption{Exploring Delays in Ike }
+\caption{Exploring Delays and Cancellation for Ike }
 \end{figure}
 \begin{figure}[H]
 \begin{subfigure}{\textwidth}
@@ -62,14 +62,12 @@ Between 2005 to 2015, there were 181 hurricanes recorded by NOAA. The year 2005 
   \includegraphics[width=.45\linewidth]{{"./Images/SandyExplorePlot1"}.png}
   \includegraphics[width=.45\linewidth]{{"./Images/SandyExplorePlot2"}.png} 
 \end{subfigure}%
-\caption{Exploring Delays in Sandy }
+\caption{Exploring Delays and Cancellation for Sandy}
 \end{figure}
 
+To begin with, the tickmarks in some of the plots are weird because for some reason SaS weren't able to order the values. To get an ordering, we added 100 to the values. \\
 
-
-
-\subsubsection{Exploring the Relationship Between Ontime Performance and Storm}
-\vskip -2ex
+From these plots, we can see that delays and cancellations were consistent during Hurricane Katrina. However, in Ike and certainly Sandy, there were a lot less delays on days where there were a lot of cancellations. This would suggest that airlines are simply cancelling flights during the storm. In Sandy, the range of total cancelled flights went as high as 800 on the scale.
 
 \begin{figure}[H]
 \begin{subfigure}{\textwidth}
@@ -81,7 +79,7 @@ Between 2005 to 2015, there were 181 hurricanes recorded by NOAA. The year 2005 
 \caption{Bubble Plots of Katrina, Ike, Sandy}
 \end{figure}
 
-A bubble plot is plotted to explore the relationship between departure distance from storm center against percentage of cancellation. The size of the bubble measures the average delay at different airport locations. Each color of the bubble represent different days of the storm available in the NOAA data. An interactive version of the plot allowing the option to hover over and see the actual values are available in the links below. Only large and medium airport hubs in the Central and Eastern timezones have been used for the plots to avoid small airports with little flights showing up with high cancellation. \\
+A bubble plot is plotted to explore the relationship between departure distance from storm center against percentage of cancellation. The size of the bubble measures the average delay at different airport locations. Each color of the bubble represent different days of the storm available in the NOAA data. Only large and medium airport hubs in the Central and Eastern timezones have been used for the plots to avoid small airports with little flights showing up with high cancellation. \\
 
 From the plots, we see that Sandy seem to have more hubs experiencing cancellations than Ike and Katrina. By the color of the bubble, we can identify the days that the hurricanes cause the highest cancellation with respect to the hub's position to the storm center. With the exception of HOU airport on day 15 for Ike, most airports experience higher cancellation when their proximity to hurricane center increase, as we would expect. The large the bubble indicates higher average delay for the hub, but from the plot we see that most of the bubble do not grow in size with decrease in departure distance to the center of the storm. Also some airports with 100\% cancellation weren't shown in the plot since they would have no delay information available to generate the size of the bubble, but we have noted them down in the table 3. 
 
