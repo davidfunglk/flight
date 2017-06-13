@@ -3,6 +3,6 @@ This is a collaborative project for STA 160 at UC Davis. The instructor is [Dr. 
 
 The purpose of this project is to analyse the impact of Atlantic hurricanes on the U.S. airport network.
 
-To read the complete project report, click [here](https://github.com/davidfunglk/flight/blob/master/Report/main.pdf).
+To read the complete project report, click <a href="https://github.com/davidfunglk/flight/blob/master/Report/main.pdf" target="_blank">here</a>.
 
-Animations may also be accessed by clicking [here](http://point.fungservices.com/flightanalysis/index.html).
+Animations may also be accessed by clicking <a href="http://point.fungservices.com/flightanalysis/index.html" target="_blank">here</a>.
